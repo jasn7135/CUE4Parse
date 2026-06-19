@@ -432,12 +432,27 @@ public static class TextureDecoder
                 data = DetexHelper.DecodeDetexLinear(bytes, sizeX, sizeY, false, DetexTextureFormat.DETEX_TEXTURE_FORMAT_ETC2_EAC, DetexPixelFormat.DETEX_PIXEL_FORMAT_BGRA8);
                 colorType = EPixelFormat.PF_B8G8R8A8;
                 break;
+            case EPixelFormat.PF_G8:
+            {
+                var pixelCount = sizeX * sizeY * sizeZ;
+                var expanded = new byte[pixelCount * 4];
+                for (var i = 0; i < pixelCount && i < bytes.Length; i++)
+                {
+                    var gray = bytes[i];
+                    expanded[i * 4 + 0] = gray;
+                    expanded[i * 4 + 1] = gray;
+                    expanded[i * 4 + 2] = gray;
+                    expanded[i * 4 + 3] = byte.MaxValue;
+                }
+                data = expanded;
+                colorType = EPixelFormat.PF_B8G8R8A8;
+                break;
+            }
 
             //SECTION: raw formats. Do nothing, we return original format and data
             case EPixelFormat.PF_A8R8G8B8:
             case EPixelFormat.PF_B8G8R8A8:
             case EPixelFormat.PF_V8U8:
-            case EPixelFormat.PF_G8:
             case EPixelFormat.PF_A32B32G32R32F:
             case EPixelFormat.PF_FloatRGB:
             case EPixelFormat.PF_FloatRGBA:
