@@ -71,6 +71,15 @@ public abstract class AbstractUePackage : UObject, IPackage
             }
         }
 
+        if (obj == null && struc?.Name.Text is { } className && className.EndsWith("DataTable", StringComparison.Ordinal)
+            && ObjectTypeRegistry.GetClass("DataTable") is { } dataTableType)
+        {
+            // Game-specific UDataTable subclasses (e.g. IGDataTable) have no resolvable super-chain
+            // in cooked data without mappings; their binary layout matches UDataTable, so construct
+            // the base type to parse the RowMap instead of falling back to a bare UObject.
+            obj = (UObject?) Activator.CreateInstance(dataTableType);
+        }
+
         obj ??= new UObject();
         obj.Class = struc;
         obj.Flags |= EObjectFlags.RF_WasLoaded;
