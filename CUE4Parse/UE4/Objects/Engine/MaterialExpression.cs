@@ -31,7 +31,7 @@ public class FMaterialInput<T> : FExpressionInput where T : struct
 
     public FMaterialInput(FAssetArchive Ar) : base(Ar)
     {
-        if (FCoreObjectVersion.Get(Ar) < FCoreObjectVersion.Type.MaterialInputNativeSerialize)
+        if (FCoreObjectVersion.Get(Ar) < FCoreObjectVersion.Type.MaterialInputNativeSerialize || Ar.Game < EGame.GAME_UE4_13)
         {
             return;
         }
@@ -114,9 +114,18 @@ public class FExpressionInput : IUStruct
 
     public FExpressionInput(FAssetArchive Ar)
     {
-        if (FCoreObjectVersion.Get(Ar) < FCoreObjectVersion.Type.MaterialInputNativeSerialize)
+        if (FCoreObjectVersion.Get(Ar) < FCoreObjectVersion.Type.MaterialInputNativeSerialize || Ar.Game < EGame.GAME_UE4_13)
         {
-            FallbackStruct  = new FStructFallback(Ar);
+            var fb = new FStructFallback(Ar);
+            Expression = fb.GetOrDefault<FPackageIndex>(nameof(Expression));
+            OutputIndex = fb.GetOrDefault(nameof(OutputIndex), 0);
+            InputName = fb.GetOrDefault(nameof(InputName), default(FName));
+            Mask = fb.GetOrDefault(nameof(Mask), 0);
+            MaskR = fb.GetOrDefault(nameof(MaskR), 0);
+            MaskG = fb.GetOrDefault(nameof(MaskG), 0);
+            MaskB = fb.GetOrDefault(nameof(MaskB), 0);
+            MaskA = fb.GetOrDefault(nameof(MaskA), 0);
+            ExpressionName = (Expression ?? new FPackageIndex()).Name.SubstringAfterLast('/');
             return;
         }
 
