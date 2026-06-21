@@ -95,10 +95,11 @@ namespace CUE4Parse.UE4.Assets.Exports.Animation
                 }
             }
 
-            if (FFrameworkObjectVersion.Get(Ar) < FFrameworkObjectVersion.Type.MoveCompressedAnimDataToTheDDC)
+            if (FFrameworkObjectVersion.Get(Ar) < FFrameworkObjectVersion.Type.MoveCompressedAnimDataToTheDDC || HasCompressedDataAsProperties())
             {
                 var compressedData = new FUECompressedAnimData();
                 CompressedDataStructure = compressedData;
+                LoadCompressedDataFromProperties(compressedData);
 
                 // Part of data were serialized as properties
                 compressedData.CompressedByteStream = Ar.ReadBytes(Ar.Read<int>());
@@ -199,6 +200,34 @@ namespace CUE4Parse.UE4.Assets.Exports.Animation
                 writer.WritePropertyName("CompressedRawDataSize");
                 writer.WriteValue(CompressedRawDataSize);
             }
+        }
+
+        private static readonly string[] PreMoveCompressedDataPropertyNames =
+        {
+            "KeyEncodingFormat", "TranslationCompressionFormat", "RotationCompressionFormat", "ScaleCompressionFormat",
+            "CompressedTrackOffsets", "CompressedScaleOffsets"
+        };
+
+        private bool HasCompressedDataAsProperties() =>
+            Properties.Exists(property => Array.IndexOf(PreMoveCompressedDataPropertyNames, property.Name.Text) >= 0);
+
+        private void LoadCompressedDataFromProperties(FUECompressedAnimData compressedData)
+        {
+            if (!HasCompressedDataAsProperties()) return;
+
+            compressedData.KeyEncodingFormat = GetOrDefault<AnimationKeyFormat>(nameof(compressedData.KeyEncodingFormat));
+            compressedData.TranslationCompressionFormat = GetOrDefault<AnimationCompressionFormat>(nameof(compressedData.TranslationCompressionFormat));
+            compressedData.RotationCompressionFormat = GetOrDefault<AnimationCompressionFormat>(nameof(compressedData.RotationCompressionFormat));
+            compressedData.ScaleCompressionFormat = GetOrDefault<AnimationCompressionFormat>(nameof(compressedData.ScaleCompressionFormat));
+            compressedData.CompressedTrackOffsets = GetOrDefault(nameof(compressedData.CompressedTrackOffsets), Array.Empty<int>());
+
+            if (GetOrDefault<FStructFallback>(nameof(compressedData.CompressedScaleOffsets)) is { } scaleOffsets)
+            {
+                compressedData.CompressedScaleOffsets.OffsetData = scaleOffsets.GetOrDefault(nameof(compressedData.CompressedScaleOffsets.OffsetData), Array.Empty<int>());
+                compressedData.CompressedScaleOffsets.StripSize = scaleOffsets.GetOrDefault<int>(nameof(compressedData.CompressedScaleOffsets.StripSize));
+            }
+
+            CompressedTrackToSkeletonMapTable = GetOrDefault(nameof(TrackToSkeletonMapTable), Array.Empty<FTrackToSkeletonMap>());
         }
 
         private void SerializeCompressedData(FAssetArchive Ar)

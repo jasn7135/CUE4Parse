@@ -247,6 +247,24 @@ public class UObject : AbstractPropertyHolder
         return GetTypedOuter(typeof(T)) as T;
     }
 
+    public UObject? GetArchetype()
+    {
+        // Pre-UE4.14 cooks (before TemplateIndex_IN_COOKED_EXPORTS) leave Template null, so fall back to the equally-named sub-object of the owner class's default object.
+        if (Template != null)
+            return Template.Load();
+        var ownerClass = Outer?.Class?.Load<UClass>();
+        var classDefaultObject = ownerClass?.ClassDefaultObject?.Load();
+        if (classDefaultObject is null || classDefaultObject == this)
+            return null;
+        foreach (var sibling in classDefaultObject.Owner?.ExportsLazy ?? [])
+        {
+            var archetype = sibling.Value;
+            if (archetype != this && archetype.Name == Name && archetype.Outer?.Load() == classDefaultObject)
+                return archetype;
+        }
+        return null;
+    }
+
     /**
          * Do any object-specific cleanup required immediately after loading an object,
          * and immediately after any undo/redo.

@@ -12,7 +12,7 @@ namespace CUE4Parse.Example
 {
     public static class Program
     {
-        private const string _gameDirectory = "D:\\Games\\Fortnite\\FortniteGame\\Content\\Paks"; // Change game directory path to the one you have.
+        private const string _gameDirectory = "run/media/jason/Disk/Builds/Rumbleverse/Season_0_#99867/RumbleverseNT/Rumbleverse/Content/Paks"; // Change game directory path to the one you have.
         private const string _aesKey = "0xF271F4B1EA375C42D3676058BAE8FBA295CB61F773070A706A48EAD7C6F98CDB";
 
         private const string _mapping = "./mappings.usmap";
@@ -29,7 +29,7 @@ namespace CUE4Parse.Example
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Console(theme: AnsiConsoleTheme.Literate).CreateLogger();
 
-            var provider = new ApkFileProvider(@"C:\Users\valen\Downloads\ZqOY4K41h0N_Qb6WjEe23TlGExojpQ.apk", new VersionContainer(EGame.GAME_UE5_3));
+            var provider = new ApkFileProvider(@"C:\Users\valen\Downloads\ZqOY4K41h0N_Qb6WjEe23TlGExojpQ.apk", new VersionContainer(EGame.GAME_UE4_27));
             // var provider = new DefaultFileProvider(_gameDirectory, SearchOption.TopDirectoryOnly, true, new VersionContainer(EGame.GAME_UE5_3));
             // provider.MappingsContainer = new FileUsmapTypeMappingsProvider(_mapping);
 

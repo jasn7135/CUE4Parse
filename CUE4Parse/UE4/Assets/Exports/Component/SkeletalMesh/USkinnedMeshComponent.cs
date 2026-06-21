@@ -16,13 +16,11 @@ public class USkinnedMeshComponent : UMeshComponent
     {
         var mesh = new FPackageIndex();
         var current = this;
-        while (true)
+        while (current is not null)
         {
-            if (current is null) break;
             mesh = current.GetOrDefault(parameterName, new FPackageIndex());
-            if (!mesh.IsNull || current.Template == null)
-                break;
-            current = current.Template.Load<USkeletalMeshComponent>();
+            if (!mesh.IsNull) break;
+            current = current.GetArchetype() as USkinnedMeshComponent;
         }
 
         return mesh;

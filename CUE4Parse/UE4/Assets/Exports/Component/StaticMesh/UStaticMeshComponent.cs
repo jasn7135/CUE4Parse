@@ -47,13 +47,11 @@ public class UStaticMeshComponent : UMeshComponent
             return StaticMesh;
         var mesh = new FPackageIndex();
         var current = this;
-        while (true)
+        while (current is not null)
         {
-            if (current is null) break;
             mesh = current.GetOrDefault("StaticMesh", new FPackageIndex());
-            if (!mesh.IsNull || current.Template == null)
-                break;
-            current = current.Template.Load<UStaticMeshComponent>();
+            if (!mesh.IsNull) break;
+            current = current.GetArchetype() as UStaticMeshComponent;
         }
         StaticMesh = mesh;
         return mesh;

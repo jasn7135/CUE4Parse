@@ -31,7 +31,7 @@ public static class FRecomputeTangentCustomVersion
 
         return Ar.Game switch
         {
-            < EGame.GAME_UE4_12 => Type.BeforeCustomVersionWasAdded,
+            < EGame.GAME_UE4_13 => Type.BeforeCustomVersionWasAdded,
             < EGame.GAME_UE4_26 => Type.RuntimeRecomputeTangent,
             _ => Type.RecomputeTangentVertexColorMask
         };

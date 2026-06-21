@@ -32,7 +32,7 @@ public class FStaticMeshVertexBuffer
         Strides = Ar.Game < EGame.GAME_UE4_19 ? Ar.Read<int>() : -1;
         NumVertices = Ar.Read<int>();
         UseFullPrecisionUVs = Ar.ReadBoolean();
-        UseHighPrecisionTangentBasis = Ar.Game >= EGame.GAME_UE4_12 && Ar.ReadBoolean();
+        UseHighPrecisionTangentBasis = FRenderingObjectVersion.Get(Ar) >= FRenderingObjectVersion.Type.IncreaseNormalPrecision && Ar.ReadBoolean();
 
         int customData = 0;
         if (Ar.Game is EGame.GAME_DeltaForce or EGame.GAME_SuicideSquad) Ar.Position += 4;
